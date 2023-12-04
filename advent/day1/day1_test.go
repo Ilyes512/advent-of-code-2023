@@ -103,15 +103,15 @@ func TestTranslateAsciiNumbers(t *testing.T) {
 		{input: "7pqrstsixteen", want: "76"},
 	}
 
-	for i, tc := range tests {
-		tc := tc
-		t.Run(fmt.Sprintf("case %d", i+1), func(st *testing.T) {
-			st.Parallel()
+	for i, test := range tests {
+		test := test
+		t.Run(fmt.Sprintf("case %d", i+1), func(tt *testing.T) {
+			tt.Parallel()
 
-			got := TranslateAsciiNumbers(tc.input)
+			got := TranslateAsciiNumbers(test.input)
 
-			if diff := cmp.Diff(tc.want, got); diff != "" {
-				st.Errorf("TranslateAsciiNumbers(%q) mismatch (-want +got):\n%s", tc.input, diff)
+			if diff := cmp.Diff(test.want, got); diff != "" {
+				tt.Errorf("TranslateAsciiNumbers(%q) mismatch (-want +got):\n%s", test.input, diff)
 			}
 		})
 	}
@@ -132,80 +132,19 @@ func TestGetAsciiNumberAtStart(t *testing.T) {
 		{input: "sixteen", want: "6"},
 	}
 
-	for i, tc := range tests {
-		tc := tc
-		t.Run(fmt.Sprintf("case %d", i+1), func(st *testing.T) {
-			st.Parallel()
+	for i, test := range tests {
+		test := test
+		t.Run(fmt.Sprintf("case %d", i+1), func(tt *testing.T) {
+			tt.Parallel()
 
-			got, ok := GetAsciiNumberAtStart(tc.input)
+			got, ok := GetAsciiNumberAtStart(test.input)
 			if !ok {
-				st.Fatalf("expected GetAsciiNumberAtStart(%q) to return true", tc.input)
+				tt.Fatalf("expected GetAsciiNumberAtStart(%q) to return true", test.input)
 			}
 
-			if diff := cmp.Diff(tc.want, got); diff != "" {
-				st.Errorf("TestGetAsciiNumberAtStart(%q) mismatch (-want +got):\n%s", tc.input, diff)
+			if diff := cmp.Diff(test.want, got); diff != "" {
+				tt.Errorf("TestGetAsciiNumberAtStart(%q) mismatch (-want +got):\n%s", test.input, diff)
 			}
 		})
 	}
 }
-
-// func TestTranslateAllAsciiNumbers(t *testing.T) {
-// 	tests := []struct {
-// 		input string
-// 		want  string
-// 	}{
-// 		{input: "two1nine", want: "219"},
-// 		{input: "eightwothree", want: "8wo3"},
-// 		{input: "abcone2threexyz", want: "abc123xyz"},
-// 		{input: "xtwone3four", want: "x2ne34"},
-// 		{input: "4nineeightseven2", want: "49872"},
-// 		{input: "zoneight234", want: "z1ight234"},
-// 		{input: "two1nine", want: "219"},
-// 		{input: "7pqrstsixteen", want: "7pqrst6teen"},
-// 	}
-
-// 	for i, tc := range tests {
-// 		tc := tc
-// 		t.Run(fmt.Sprintf("case %d", i), func(st *testing.T) {
-// 			st.Parallel()
-
-// 			got := TranslateAllAsciiNumbers(tc.input)
-
-// 			if diff := cmp.Diff(tc.want, got); diff != "" {
-// 				st.Errorf("translateAsciiNumbers(%q) mismatch (-want +got):\n%s", tc.input, diff)
-// 			}
-// 		})
-// 	}
-// }
-
-// func TestTranslateSingleAsciiNumbers(t *testing.T) {
-// 	tests := []struct {
-// 		input string
-// 		want  string
-// 	}{
-// 		{input: "two1nine", want: "21nine"},
-// 		{input: "eightwothree", want: "8wothree"},
-// 		{input: "abcone2threexyz", want: "abc12threexyz"},
-// 		{input: "xtwone3four", want: "x2ne3four"},
-// 		{input: "4nineeightseven2", want: "49eightseven2"},
-// 		{input: "zoneight234", want: "z1ight234"},
-// 		{input: "two1nine", want: "21nine"},
-// 		{input: "7pqrstsixteen", want: "7pqrst6teen"},
-// 	}
-
-// 	for i, tc := range tests {
-// 		tc := tc
-// 		t.Run(fmt.Sprintf("case %d", i), func(st *testing.T) {
-// 			st.Parallel()
-
-// 			got, updated := TranslateSingleAsciiNumbers(tc.input)
-// 			if !updated {
-// 				st.Fatalf("expected TranslateSingleAsciiNumbers(%q) to return true", tc.input)
-// 			}
-
-// 			if diff := cmp.Diff(tc.want, got); diff != "" {
-// 				st.Errorf("translateAsciiNumbers(%q) mismatch (-want +got):\n%s", tc.input, diff)
-// 			}
-// 		})
-// 	}
-// }
