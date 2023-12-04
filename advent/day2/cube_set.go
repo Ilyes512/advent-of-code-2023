@@ -28,3 +28,17 @@ func (cs *CubeSet) getByColor(color Color) (*Cube, bool) {
 
 	return nil, false
 }
+
+func (cs *CubeSet) GetPower() int {
+	power := 0
+	for i := range cs.Cubes {
+		if power == 0 {
+			power = cs.Cubes[i].Amount
+			continue
+		}
+
+		power *= cs.Cubes[i].Amount
+	}
+
+	return power
+}

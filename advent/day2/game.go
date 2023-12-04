@@ -22,6 +22,34 @@ func (g *Game) IsPossible(set CubeSet) bool {
 	return true
 }
 
+func (g *Game) GetRequiredCubes() *CubeSet {
+	cubeSet := CubeSet{
+		Cubes: []Cube{
+			{Amount: 0, Color: Red},
+			{Amount: 0, Color: Green},
+			{Amount: 0, Color: Blue},
+		},
+	}
+
+	for i := range g.Sets {
+		for j := range g.Sets[i].Cubes {
+			cube := g.Sets[i].Cubes[j]
+
+			minCube, ok := cubeSet.getByColor(cube.Color)
+			if !ok {
+				log.Panic("Color not found in cube set")
+			}
+
+			if minCube.Amount == 0 || minCube.Amount < cube.Amount {
+				minCube.Amount = cube.Amount
+			}
+		}
+	}
+
+	return &cubeSet
+
+}
+
 func NewGame(input string) Game {
 	result := strings.SplitN(input, ":", 2)
 	if len(result) < 1 {

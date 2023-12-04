@@ -16,7 +16,8 @@ func main() {
 	}
 	defer file.Close()
 
-	total := 0
+	totalPart1 := 0
+	totalPart2 := 0
 	input := day2.CubeSet{
 		Cubes: []day2.Cube{
 			{Amount: 12, Color: day2.Red},
@@ -29,13 +30,16 @@ func main() {
 	for scanner.Scan() {
 		game := day2.NewGame(scanner.Text())
 		if game.IsPossible(input) {
-			total += game.Id
+			totalPart1 += game.Id
 		}
+
+		totalPart2 += game.GetRequiredCubes().GetPower()
 	}
 
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Part 1 total: %d\n", total)
+	fmt.Printf("Part 1 total: %d\n", totalPart1)
+	fmt.Printf("Part 2 total: %d\n", totalPart2)
 }
