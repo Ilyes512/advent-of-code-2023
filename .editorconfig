@@ -11,7 +11,7 @@ trim_trailing_whitespace = true
 [*.go]
 indent_style = tab
 
-[*.md,*_test.go]
+[{*.{txt,md},*_test.go}]
 trim_trailing_whitespace = false
 
 [*.{json,js,ts,vue,yml,yaml}]
