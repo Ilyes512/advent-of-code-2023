@@ -5,16 +5,16 @@ import (
 	"log"
 	"os"
 
-	"github.com/Ilyes512/advent-of-code-2023/advent/day1"
+	"github.com/Ilyes512/advent-of-code-2023/advent/day01"
 )
 
 func main() {
-	contents, err := os.ReadFile("./solutions/day1/input.txt")
+	contents, err := os.ReadFile("./solutions/day01/input.txt")
 	if err != nil {
 		log.Panic(err)
 	}
 
-	document := day1.NewDocument(string(contents))
+	document := day01.NewDocument(string(contents))
 
 	answerPart1, err := document.Calculate()
 	if err != nil {

@@ -6,11 +6,11 @@ import (
 	"log"
 	"os"
 
-	"github.com/Ilyes512/advent-of-code-2023/advent/day2"
+	"github.com/Ilyes512/advent-of-code-2023/advent/day02"
 )
 
 func main() {
-	file, err := os.Open("./solutions/day2/input.txt")
+	file, err := os.Open("./solutions/day02/input.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -18,17 +18,17 @@ func main() {
 
 	totalPart1 := 0
 	totalPart2 := 0
-	input := day2.CubeSet{
-		Cubes: []day2.Cube{
-			{Amount: 12, Color: day2.Red},
-			{Amount: 13, Color: day2.Green},
-			{Amount: 14, Color: day2.Blue},
+	input := day02.CubeSet{
+		Cubes: []day02.Cube{
+			{Amount: 12, Color: day02.Red},
+			{Amount: 13, Color: day02.Green},
+			{Amount: 14, Color: day02.Blue},
 		},
 	}
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		game := day2.NewGame(scanner.Text())
+		game := day02.NewGame(scanner.Text())
 		if game.IsPossible(input) {
 			totalPart1 += game.Id
 		}

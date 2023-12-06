@@ -1,4 +1,4 @@
-package day4
+package day04
 
 func NewCards() *cards {
 	return &cards{

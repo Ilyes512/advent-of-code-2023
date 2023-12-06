@@ -6,17 +6,17 @@ import (
 	"log"
 	"os"
 
-	"github.com/Ilyes512/advent-of-code-2023/advent/day4"
+	"github.com/Ilyes512/advent-of-code-2023/advent/day04"
 )
 
 func main() {
-	file, err := os.Open("./solutions/day4/input.txt")
+	file, err := os.Open("./solutions/day04/input.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer file.Close()
 
-	cards := day4.NewCards()
+	cards := day04.NewCards()
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
