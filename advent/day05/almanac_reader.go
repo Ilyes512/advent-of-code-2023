@@ -4,14 +4,18 @@ import (
 	"bufio"
 	"log"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 type Reader struct {
-	filePath string
-	seeds    []int
-	mappings []*mapping
+	loaded    bool
+	filePath  string
+	seeds     []int
+	seedPairs [][]int
+	mappings  []*mapping
 }
 
 func NewReader(filePath string) *Reader {
@@ -37,6 +41,72 @@ func (r *Reader) Process() int {
 	return lowestLocation
 }
 
+func (r *Reader) ProcessPart2() int {
+	r.read()
+
+	consumer := 20
+	producerChan := make(chan int, 1_000_000)
+	lowestChan := make(chan int, consumer)
+
+	go func(ch chan<- int) {
+		for _, seedPair := range r.seedPairs {
+			for j := seedPair[0]; j < seedPair[1]; j++ {
+				ch <- j
+			}
+		}
+
+		defer close(producerChan)
+	}(producerChan)
+
+	wg := sync.WaitGroup{}
+
+	for i := 0; i < consumer; i++ {
+		wg.Add(1)
+
+		go func() {
+			defer wg.Done()
+
+			first := true
+			min := 0
+			for seed := range producerChan {
+				location := r.getLocation(seed)
+
+				if first == true {
+					min = location
+					first = false
+				}
+
+				if location < min {
+					min = location
+				}
+			}
+			if first == false {
+				lowestChan <- min
+			}
+		}()
+	}
+	wg.Wait()
+	close(lowestChan)
+
+	result := 0
+	for i := 0; i < consumer; i++ {
+		min, ok := <-lowestChan
+		if !ok {
+			break
+		}
+
+		if i == 0 {
+			result = min
+		}
+
+		if min < result {
+			result = min
+		}
+	}
+
+	return result
+}
+
 func (r *Reader) getLocation(seed int) int {
 	output := seed
 	for _, m := range r.mappings {
@@ -47,6 +117,10 @@ func (r *Reader) getLocation(seed int) int {
 }
 
 func (r *Reader) read() {
+	if r.loaded {
+		return
+	}
+
 	file, err := os.Open(r.filePath)
 	if err != nil {
 		log.Fatal(err)
@@ -84,6 +158,8 @@ func (r *Reader) read() {
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
+
+	r.loaded = true
 }
 
 func (r *Reader) processSeeds(input string) {
@@ -93,6 +169,16 @@ func (r *Reader) processSeeds(input string) {
 	}
 
 	r.seeds = getSliceOfInts(seeds)
+
+	if len(r.seeds)%2 != 0 {
+		log.Fatalf("Invalid seed input (number of seeds should be divisible by 2): %s", input)
+	}
+
+	for i := 0; i < len(r.seeds); i += 2 {
+		r.seedPairs = append(r.seedPairs, []int{r.seeds[i], r.seeds[i] + r.seeds[i+1]})
+	}
+
+	// r.seedPairs = removeOverlappingRanges(r.seedPairs)
 }
 
 func (r *Reader) processMapping(input string) {
@@ -152,4 +238,29 @@ func getSliceOfInts(input string) []int {
 	}
 
 	return ints
+}
+
+func removeOverlappingRanges(ranges [][]int) [][]int {
+	sort.Slice(ranges, func(i, j int) bool {
+		return ranges[i][0] < ranges[j][0]
+	})
+
+LOOP:
+	end := ranges[0][1]
+	for i := 1; i <= len(ranges)-1; i++ {
+		if ranges[i][0] < end && ranges[i][1] < end {
+			// removeOverlappingRange
+			ranges = append(ranges[:i], ranges[i+1:]...)
+			goto LOOP
+		}
+
+		if ranges[i][0] < end && ranges[i][1] > end {
+			// left is inside previous range but end is outside
+			ranges[i-1][1] = ranges[i][1]
+			ranges = append(ranges[:i], ranges[i+1:]...)
+			goto LOOP
+		}
+	}
+
+	return ranges
 }

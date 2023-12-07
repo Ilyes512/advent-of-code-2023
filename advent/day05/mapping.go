@@ -23,7 +23,7 @@ type mapRange struct {
 }
 
 func (r *mapRange) inRange(source int) bool {
-	return source >= r.source && source <= r.source+r.len
+	return source >= r.source && source < r.source+r.len
 }
 
 func (r *mapRange) diff() int {
