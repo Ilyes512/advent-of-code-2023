@@ -9,6 +9,6 @@ import (
 func main() {
 	reader := day05.NewReader("./solutions/day05/input.txt")
 
-	fmt.Printf("Part 1 answer: %d\n", reader.Process())
+	fmt.Printf("Part 1 answer: %d\n", reader.ProcessPart1())
 	fmt.Printf("Part 2 answer: %d\n", reader.ProcessPart2())
 }
