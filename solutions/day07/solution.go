@@ -7,7 +7,8 @@ import (
 )
 
 func main() {
-	part1 := day07.NewHands("./solutions/day07/input.txt").ResultPart1()
+	hands, handsWithJoker := day07.NewHands("./solutions/day07/input.txt")
 
-	fmt.Printf("Part 1 answer: %d\n", part1)
+	fmt.Printf("Part 1 answer: %d\n", hands.Result())
+	fmt.Printf("Part 2 answer: %d\n", handsWithJoker.Result())
 }

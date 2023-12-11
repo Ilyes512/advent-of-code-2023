@@ -2,27 +2,6 @@ package day07
 
 type handType int
 
-func (h handType) String() string {
-	switch h {
-	case FiveOfAKind:
-		return "Five of a kind"
-	case FourOfAKind:
-		return "Four of a kind"
-	case FullHouse:
-		return "Full house"
-	case ThreeOfAKind:
-		return "Three of a kind"
-	case TwoPairs:
-		return "Two pairs"
-	case OnePair:
-		return "One pair"
-	case HighCard:
-		return "High card"
-	default:
-		return "Unknown"
-	}
-}
-
 const (
 	HighCard handType = iota
 	OnePair
@@ -34,16 +13,7 @@ const (
 )
 
 func determineHandType(input []int) handType {
-	grouped := make(map[int]int)
-
-	for _, card := range input {
-		c, found := grouped[card]
-		if found {
-			grouped[card] = c + 1
-		} else {
-			grouped[card] = 1
-		}
-	}
+	grouped := groupedCards(input)
 
 	switch len(grouped) {
 	case 1:
@@ -67,6 +37,51 @@ func determineHandType(input []int) handType {
 	}
 }
 
+func determineHandTypeWithJoker(input []int) handType {
+	grouped := groupedCards(input)
+
+	joker, containsJoker := grouped[joker_value]
+	if !containsJoker {
+		return determineHandType(input)
+	}
+	delete(grouped, joker_value)
+
+	switch joker {
+	case 5, 4:
+		return FiveOfAKind
+	case 3:
+		if len(grouped) == 1 {
+			return FiveOfAKind
+		} else {
+			return FourOfAKind
+		}
+	case 2:
+		switch len(grouped) {
+		case 1:
+			return FiveOfAKind
+		case 2:
+			return FourOfAKind
+		default:
+			return ThreeOfAKind
+		}
+	default:
+		switch len(grouped) {
+		case 1:
+			return FiveOfAKind
+		case 2:
+			if mapContainsValue(grouped, 3) {
+				return FourOfAKind
+			} else {
+				return FullHouse
+			}
+		case 3:
+			return ThreeOfAKind
+		default:
+			return OnePair
+		}
+	}
+}
+
 func mapContainsValue(m map[int]int, value int) bool {
 	for _, v := range m {
 		if v == value {
@@ -75,4 +90,19 @@ func mapContainsValue(m map[int]int, value int) bool {
 	}
 
 	return false
+}
+
+func groupedCards(input []int) map[int]int {
+	grouped := make(map[int]int)
+
+	for _, card := range input {
+		c, found := grouped[card]
+		if found {
+			grouped[card] = c + 1
+		} else {
+			grouped[card] = 1
+		}
+	}
+
+	return grouped
 }

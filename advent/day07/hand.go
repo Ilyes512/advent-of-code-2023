@@ -10,16 +10,18 @@ import (
 	"strings"
 )
 
-type hands []*hand
+type hands []hand
 
-func NewHands(filePath string) hands {
+func NewHands(filePath string) (hands, hands) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		log.Panic(err)
 	}
 	defer file.Close()
 
-	result := make([]*hand, 0)
+	hands := make([]hand, 0)
+	handsWithJoker := make([]hand, 0)
+
 	cardMapping := NewCardMapping()
 
 	scanner := bufio.NewScanner(file)
@@ -30,41 +32,67 @@ func NewHands(filePath string) hands {
 			log.Panicf("Invalid input: %s", line)
 		}
 
-		result = append(result, NewHand(split[1], cardMapping.GetCardValues(split[0])))
+		cards := cardMapping.GetCardValues(split[0])
+
+		hands = append(hands, NewHand(split[1], split[0], cards))
+		handsWithJoker = append(handsWithJoker, NewHandWithJoker(split[1], split[0], cards))
 	}
 
-	result = sortHands(result)
+	hands = sortHands(hands)
+	handsWithJoker = sortHands(handsWithJoker)
 
-	return result
+	return hands, handsWithJoker
 }
 
 type hand struct {
-	bid      int
-	cards    []int
-	strength int
-	handType handType
+	cardsString   string
+	bid           int
+	originalCards []int
+	cards         []int
+	strength      int
+	handType      handType
 }
 
-func NewHand(bid string, cards []int) *hand {
+func NewHand(bid string, cardsString string, cards []int) hand {
 	bidValue, err := strconv.Atoi(bid)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	return &hand{
-		bid:      bidValue,
-		cards:    cards,
-		strength: sumInt(cards),
-		handType: determineHandType(cards),
+	return hand{
+		cardsString:   cardsString,
+		bid:           bidValue,
+		originalCards: cards,
+		cards:         cards,
+		strength:      calculateStrength(cards),
+		handType:      determineHandType(cards),
+	}
+}
+
+func NewHandWithJoker(bid string, cardsString string, cards []int) hand {
+	bidValue, err := strconv.Atoi(bid)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	cardsWithJoker := replaceValues(cards, joker_value, 0)
+
+	return hand{
+		cardsString:   cardsString,
+		bid:           bidValue,
+		originalCards: cards,
+		cards:         cardsWithJoker,
+		strength:      calculateStrength(cardsWithJoker),
+		handType:      determineHandTypeWithJoker(cards),
 	}
 }
 
 func sortHands(input hands) hands {
-	slices.SortFunc(input, func(a, b *hand) int {
+	slices.SortFunc(input, func(a, b hand) int {
 		return cmp.Compare(a.strength, b.strength)
 	})
 
-	slices.SortStableFunc(input, func(a, b *hand) int {
+	slices.SortStableFunc(input, func(a, b hand) int {
 		result := cmp.Compare(a.handType, b.handType)
 
 		if result == 0 {
@@ -77,7 +105,7 @@ func sortHands(input hands) hands {
 	return input
 }
 
-func (h hands) ResultPart1() int {
+func (h hands) Result() int {
 	total := 0
 
 	for i, hand := range h {
@@ -87,11 +115,22 @@ func (h hands) ResultPart1() int {
 	return total
 }
 
-func sumInt(input []int) int {
+func calculateStrength(input []int) int {
 	sum := 0
-	for _, i := range input {
-		sum += i
+	for _, v := range input {
+		sum += v
 	}
 
 	return sum
+}
+
+func replaceValues(s []int, old, new int) []int {
+	copy := slices.Clone(s)
+	for i, v := range copy {
+		if v == old {
+			copy[i] = new
+		}
+	}
+
+	return copy
 }

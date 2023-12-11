@@ -4,6 +4,8 @@ import "log"
 
 type cardMapping map[string]int
 
+const joker_value = 10
+
 func NewCardMapping() cardMapping {
 	return cardMapping{
 		"A": 13,
